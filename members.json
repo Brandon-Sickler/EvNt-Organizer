@@ -1,0 +1,18 @@
+[
+    {
+        "id": 1728640001,
+        "fullName": "Brandon Sickler",
+        "email": "bms6598@psu.edu",
+        "age": 36,
+        "affiliation": "Penn State World Campus",
+        "phone": "555-555-5555"
+    },
+    {
+        "id": 1728640002,
+        "fullName": "Antwan Blassingame",
+        "email": "aab123@psu.edu",
+        "age": 25,
+        "affiliation": "EvNt Technical Committee",
+        "phone": "555-555-5555"
+    }
+]
