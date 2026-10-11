@@ -64,7 +64,7 @@ signupForm.addEventListener("submit", function (e) {
     }
 
     if (affiliation.length < 2) {
-        errors.push("Address or Affiliation is required.");
+        errors.push("Affiliation / Organization is required.");
     }
 
     if (phone.length > 0) {
