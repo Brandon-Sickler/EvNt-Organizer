@@ -1,0 +1,26 @@
+[
+    {
+        "id": "EVNT-101",
+        "title": "Modern Cloud Architecture & Microservices",
+        "category": "Technical Breakout",
+        "format": "In-Person",
+        "price": 149.99,
+        "additionalInfo": "Room 302B - Dr. Jane Smith"
+    },
+    {
+        "id": "Evnt-102",
+        "title": "AI & Automated Development Workflows",
+        "category": "Keynote",
+        "format": "Hybrid",
+        "price": 0.00,
+        "additionalInfo": "Main Auditorium - Live Streamed"
+    },
+    {
+        "id": "EVNT-103",
+        "title": "Hands-On React Native & Offline Sync Workshop",
+        "category": "Workshop",
+        "format": "In-Person",
+        "price": 89.99,
+        "additionalInfo": "Lab Hall C - Laptops Required"
+    }
+]
