@@ -139,37 +139,42 @@ function renderSessions(data) {
 
     sessionsJsonOutput.textContent = JSON.stringify(sessionsList, null, 2);
 }
-
-
 window.editSession = function (index) {
     const item = sessionsList[index];
-    sessionIdInput.value = item.id;
-    sessionTitleInput.value = item.title;
-    sessionCategoryInput.value = item.category;
-    sessionFormatInput.value = item.format;
-    sessionPriceInput.value = item.price;
-    sessionAdditionalInput.value = item.additionalInfo === "General Admission" ? "" : item.additionalInfo;
+    $(sessionIdInput).val(item.id);
+    $(sessionTitleInput).val(item.title);
+    $(sessionCategoryInput).val(item.category);
+    $(sessionFormatInput).val(item.format);
+    $(sessionPriceInput).val(item.price);
+    $(sessionAdditionalInput).val(item.additionalInfo === "General Admission" ? "" : item.additionalInfo);
 
-    editSessionIndexInput.value = index;
-    saveSessionBtn.textContent = "Update Session";
-    cancelSessionEditBtn.classList.remove("d-none");
-    sessionErrorAlert.classList.add("d-none");
+    $(editSessionIndexInput).val(index);
+    $(saveSessionBtn).text("Update Session");
+    $(cancelSessionEditBtn).removeClass("d-none");
+    $(sessionErrorAlert).addClass("d-none");
     window.scrollTo({ top: 0, behavior: "smooth" });
 };
-
-
 function resetSessionForm() {
-    sessionForm.reset();
-    editSessionIndexInput.value = "-1";
-    saveSessionBtn.textContent = "Add Session";
-    cancelSessionEditBtn.classList.add("d-none");
-    sessionErrorAlert.classList.add("d-none");
+    $(sessionForm).trigger("reset");
+    $(editSessionIndexInput).val("-1");
+    $(saveSessionBtn).text("Update Session");
+    $(cancelSessionEditBtn).removeClass("d-none");
+    $(sessionErrorAlert).addClass("d-none");
 }
-
 cancelSessionEditBtn.addEventListener("click", resetSessionForm);
-
-
 window.deleteSession = function (index) {
     sessionsList.splice(index, 1);
     renderSessions(sessionsList);
 };
+function filterSessions() {
+    const searchInput = $("#searchInput").val().toLowerCase();
+    const selectedCategory = $("#filterCategory").val();
+    const filteredSessions = sessionsList.filter(session => {
+        const matchesSearch = session.title.toLowerCase().includes(searchInput) || session.id.toLowerCase().includes(searchInput);
+        const matchesCategory = selectedCategory === "" || session.category === selectedCategory || selectedCategory === "ALL";
+        return matchesSearch && matchesCategory;
+    });
+    renderSessions(filteredSessions);
+}
+$("#searchInput").on("input", filterSessions);
+$("#filterCategory").on("change", filterSessions);
