@@ -154,27 +154,35 @@ window.editSession = function (index) {
     $(sessionErrorAlert).addClass("d-none");
     window.scrollTo({ top: 0, behavior: "smooth" });
 };
+
 function resetSessionForm() {
     $(sessionForm).trigger("reset");
     $(editSessionIndexInput).val("-1");
-    $(saveSessionBtn).text("Update Session");
-    $(cancelSessionEditBtn).removeClass("d-none");
+    $(saveSessionBtn).text("Add Session");
+    $(cancelSessionEditBtn).addClass("d-none");
     $(sessionErrorAlert).addClass("d-none");
 }
+
 cancelSessionEditBtn.addEventListener("click", resetSessionForm);
+
 window.deleteSession = function (index) {
     sessionsList.splice(index, 1);
-    renderSessions(sessionsList);
+    filterSessions();
 };
+
 function filterSessions() {
-    const searchInput = $("#searchInput").val().toLowerCase();
+    const searchInput = $("#searchInput").val().toLowerCase().trim();
     const selectedCategory = $("#filterCategory").val();
     const filteredSessions = sessionsList.filter(session => {
-        const matchesSearch = session.title.toLowerCase().includes(searchInput) || session.id.toLowerCase().includes(searchInput);
-        const matchesCategory = selectedCategory === "" || session.category === selectedCategory || selectedCategory === "ALL";
+        const matchesSearch = session.title.toLowerCase().includes(searchInput) || 
+                              session.id.toLowerCase().includes(searchInput);
+        const matchesCategory = selectedCategory === "" || 
+                                session.category === selectedCategory || 
+                                selectedCategory === "ALL";
         return matchesSearch && matchesCategory;
     });
     renderSessions(filteredSessions);
 }
+
 $("#searchInput").on("input", filterSessions);
 $("#filterCategory").on("change", filterSessions);
