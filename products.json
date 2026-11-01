@@ -1,0 +1,34 @@
+[
+    {
+        "id": "PASS-ALL",
+        "title": "Full Access Conference Pass",
+        "category": "Admission Pass",
+        "format": "Multi-Day All-Access",
+        "price": 299.00,
+        "additionalInfo": "Includes Keynotes, Breakouts, and Networking Reception"
+    },
+    {
+        "id": "WORK-CLOUD",
+        "title": "Cloud Native Architecture Workshop",
+        "category": "Workshop Add-on",
+        "format": "Single-Day Intensive",
+        "price": 99.50,
+        "additionalInfo": "Includes Hands-On Lab Access & Digitial Course Material"
+    },
+    {
+        "id": "PASS-VIRTUAL",
+        "title": "Virtual Livestream & On-Demand Pass",
+        "category": "Admission Pass",
+        "format": "Digital Streaming",
+        "price": 49.00,
+        "additionalInfo": "Live Streamed Sessions + 90-Day Recording Archive"
+    },
+    {
+        "id": "SWAG-VIP",
+        "title": "VIP Speaker Luncheon & Swag Pack",
+        "category": "Merchandise & Perks",
+        "format": "Physical Badge & Pack",
+        "price": 39.99,
+        "additionalInfo": "Commemorative T-Shirt (Size L) & Luncheon Ticket"
+    }
+]
