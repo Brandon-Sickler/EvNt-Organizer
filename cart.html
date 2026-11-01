@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EvNt Organizer - Registration & Cart</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="bg-light">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-black mb-4">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">EvNt Organizer</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto gap-3 align-items-center">
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="index.html">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="signup.html">Register / Sign Up</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="index.html">Speakers</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="index.html">Contact Us</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="index.html">Activities</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="index.html">Schedule</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="sessions.html">Manage Sessions</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active fw-bold text-white" href="cart.html">
+                            Cart / Checkout <span id="navCartCount" class="badge bg-primary ms-1">0</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container mb-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div id="ajaxResponseAlert" class="alert alert-success d-none mb-4" role="alert"></div>
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h4 class="mb-0">Add Custom Conference Item / Pass</h4>
+                    </div>
+                    <div class="card-body">
+                        <div id="productErrorAlert" class="alert alert-danger d-none" role="alert"></div>
+                        <form id="productForm" novalidate>
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <label for="productId" class="form-label">Product SKU / ID <span
+                                            class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="productId" placeholder="e.g. PASS-VIP">
+                                </div>
+                                <div class="col-md-8 mb-3">
+                                    <label for="productTitle" class="form-label">Item Title / Description <span
+                                            class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="productTitle"
+                                        placeholder="e.g. All-Access VIP Executive Pass">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <label for="productCategory" class="form-label">Category <span
+                                            class="text-danger">*</span></label>
+                                    <select class="form-select" id="productCategory">
+                                        <option value="">Select Category...</option>
+                                        <option value="Admission Pass">Admission Pass</option>
+                                        <option value="Workshop Add-on">Workshop Add-on</option>
+                                        <option value="Merchandise & Perks">Merchandise & Perks</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label for="productFormat" class="form-label">Unit of Measure / Format <span
+                                            class="text-danger">*</span></label>
+                                    <select class="form-select" id="productFormat">
+                                        <option value="">Select Format...</option>
+                                        <option value="Multi-Day All-Access">Multi-Day All-Access</option>
+                                        <option value="Single-Day Intensive">Single-Day Intensive</option>
+                                        <option value="Digital Streaming">Digital Streaming</option>
+                                        <option value="Physical Badge & Pack">Physical Badge & Pack</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label for="productPrice" class="form-label">Unit Price ($) <span
+                                            class="text-danger">*</span></label>
+                                    <input type="number" step="0.01" min="0" class="form-control" id="productPrice"
+                                        placeholder="0.00">
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="productAdditional" class="form-label">Additional Details / Inclusions <span
+                                        class="text-muted">(Optional)</span></label>
+                                <input type="text" class="form-control" id="productAdditional"
+                                    placeholder="e.g. Includes executive lounge access & lunch voucher">
+                            </div>
+                            <button type="submit" id="saveProductBtn" class="btn btn-primary">Add Item to
+                                Catalog</button>
+                        </form>
+                    </div>
+                </div>
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Available Passes & Add-ons</h5>
+                        <span id="catalogCounter" class="badge bg-secondary">4 Items</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-2 mb-3">
+                            <div class="col-md-8">
+                                <input type="text" id="catalogSearchInput" class="form-control"
+                                    placeholder="Search catalog by title, SKU, or info (jQuery)...">
+                            </div>
+                            <div class="col-md-4">
+                                <select id="catalogCategoryFilter" class="form-select">
+                                    <option value="ALL">All Categories</option>
+                                    <option value="Admission Pass">Admission Pass</option>
+                                    <option value="Workshop Add-on">Workshop Add-on</option>
+                                    <option value="Merchandise & Perks">Merchandise & Perks</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div id="catalogContainer" class="row g-3"></div>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Your Registration Cart</h5>
+                        <button id="clearCartBtn" class="btn btn-sm btn-outline-light">Clear Cart</button>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0 align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>SKU</th>
+                                        <th>Description</th>
+                                        <th>Category</th>
+                                        <th>Unit Price</th>
+                                        <th style="width: 110px;">Qty</th>
+                                        <th>Subtotal</th>
+                                        <th class="text-center">Remove</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="cartTableBody">
+                                    <tr>
+                                        <td colspan="7" class="text-center text-muted py-4">Your registration cart is
+                                            empty. Add passes above!</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="d-flex justify-content-end mt-4">
+                            <div class="col-md-5">
+                                <ul class="list-group list-group-flush mb-3">
+                                    <li class="list-group-item d-flex justify-content-between">
+                                        <span>Subtotal:</span>
+                                        <strong id="cartSubtotal">$0.00</strong>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between">
+                                        <span>Estimated Tax (8.25%):</span>
+                                        <span id="cartTax">$0.00</span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between bg-light">
+                                        <span class="fw-bold">Total Registration Cost:</span>
+                                        <strong id="cartTotal" class="text-primary fs-5">$0.00</strong>
+                                    </li>
+                                </ul>
+                                <button id="checkoutBtn" class="btn btn-success w-100 py-2 fw-semibold" disabled> Submit
+                                    Registration via AJAX</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card shadow-sm">
+                    <div class="card-header bg-secondary text-white">
+                        <h6 class="mb-0">AJAX Transport Payload Preview (JSON Format)</h6>
+                    </div>
+                    <div class="card-body p-2 bg-dark">
+                        <pre id="cartJsonOutput" class="text-light m-0 font-monospace small">[]</pre>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+    <footer class="bg-black text-white py-4 mt-auto">
+        <div class="container text-center">
+            <p class="mb-0">&copy; 2026 EvNt Organizer. All rights reserved.</p>
+        </div>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="cart.js"></script>
+</body>
+
+</html>
