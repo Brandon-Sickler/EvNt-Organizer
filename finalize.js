@@ -9,8 +9,29 @@ function AttendanceFinalizationApp() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [responseMessage, setResponseMessage] = useState(null);
 
+    const [validationError, setValidationError] = useState("");
+
     const handleSubmit = (e) => {
         e.preventDefault();
+        setValidationError("");
+        setResponseMessage(null);
+        const orderSkuRegex = /^ORD-\d{4}-\d{3,4}$/;
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+        if (!orderSkuRegex.test(orderId.trim())) {
+            setValidationError("Invalid Order SKU format. Expected format: ORD-YYYY-### (e.g., ORD-2026-101).");
+            return;
+        }
+
+        if (attendeeName.trim().length < 3) {
+            setValidationError("Attendee Full Name must be at least 3 characters in length.");
+            return;
+        }
+
+        if (!emailRegex.test(email.trim())) {
+            setValidationError("Please enter a valid email address (e.g., user@example.com).");
+            return;
+        }
 
         const payload = {
             orderId: orderId.trim(),
@@ -22,7 +43,6 @@ function AttendanceFinalizationApp() {
         };
 
         setIsSubmitting(true);
-        setResponseMessage(null);
 
         $.ajax({
             url: "https://jsonplaceholder.typicode.com/posts",
@@ -31,13 +51,16 @@ function AttendanceFinalizationApp() {
             data: JSON.stringify(payload),
             success: function (data) {
                 setIsSubmitting(false);
-                setResponseMessage({type: "success", text: `RSVP Finalized! Server Record ID: ${data.id}` 
+                setResponseMessage({
+                    type: "success",
+                    text: `RSVP Finalized! Server Record ID: ${data.id}`
                 });
             },
             error: function () {
                 setIsSubmitting(false);
                 setResponseMessage({
-                    type: "danger", text: "AJAX Transport Error. Please try again."
+                    type: "danger",
+                    text: "AJAX Transport Error. Please try again."
                 });
             }
         });
@@ -54,6 +77,12 @@ function AttendanceFinalizationApp() {
                 {responseMessage && (
                     <div className={`alert alert-${responseMessage.type} mb-3`} role="alert">
                         <strong>{responseMessage.text}</strong>
+                    </div>
+                )}
+
+                {validationError && (
+                    <div className="alert alert-danger mb-3" role="alert">
+                        <strong>Validation Error:</strong> {validationError}
                     </div>
                 )}
 
