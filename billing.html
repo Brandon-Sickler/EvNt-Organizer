@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="billingApp">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EvNt Organizer - Billing Details</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-light" ng-controller="BillingController">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-black mb-4">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">EvNt Organizer</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto gap-3 align-items-center">
+                    <li class="nav-item"><a class="nav-link text-white" href="index.html">Home</a></li>
+                    <li class="nav-item"><a class="nav-link text-white" href="signup.html">Register / Sign Up</a></li>
+                    <li class="nav-item"><a class="nav-link text-white" href="sessions.html">Manage Sessions</a></li>
+                    <li class="nav-item"><a class="nav-link text-white" href="cart.html">Cart / Checkout</a></li>
+                    <li class="nav-item"><a class="nav-link text-white" href="finalize.html">Finalization</a></li>
+                    <li class="nav-item"><a class="nav-link active fw-bold text-white" href="billing.html">Billing Details</a></li>
+                    <li class="nav-item"><a class="nav-link text-white" href="returns.html">Returns</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <main class="container mb-5">
+        <h1 class="mb-3">Billing Details</h1>
+        <p class="text-muted mb-4">Please enter your payment and billing details below.</p>
+
+        <!-- Error and Success Alerts -->
+        <div class="alert alert-danger" ng-if="errorMessage !== ''">
+            {{ errorMessage }}
+        </div>
+        <div class="alert alert-success" ng-if="successMessage !== ''">
+            {{ successMessage }}
+        </div>
+
+        <div class="row">
+            <div class="col-md-7 mb-4">
+                <div class="card">
+                    <div class="card-header bg-dark text-white">Payment Information</div>
+                    <div class="card-body">
+                        <form ng-submit="submitForm()">
+                            <div class="mb-3">
+                                <label class="form-label">Full Name</label>
+                                <input type="text" class="form-control" ng-model="fullName" placeholder="Enter your full name">
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Billing Address</label>
+                                <input type="text" class="form-control" ng-model="address" placeholder="Enter your address">
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Credit Card Number</label>
+                                <input type="text" class="form-control" ng-model="cardNumber" placeholder="1234567812345678" maxlength="16">
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Expiration Date (MM/YY)</label>
+                                    <input type="text" class="form-control" ng-model="expiration" placeholder="09/28" maxlength="5">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Security Code (CVV)</label>
+                                    <input type="text" class="form-control" ng-model="cvv" placeholder="123" maxlength="4">
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary w-100">Submit Payment</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-5">
+                <div class="card">
+                    <div class="card-header bg-dark text-white">Order Summary</div>
+                    <div class="card-body">
+                        <ul class="list-group mb-3">
+                            <li class="list-group-item d-flex justify-content-between" ng-repeat="item in cartItems">
+                                <span>{{ item.name }}</span>
+                                <span>${{ item.price.toFixed(2) }}</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between">
+                                <span>Shipping (Standard Mail)</span>
+                                <span>${{ shippingCost.toFixed(2) }}</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between fw-bold">
+                                <span>Total Amount</span>
+                                <span>${{ totalAmount.toFixed(2) }}</span>
+                            </li>
+                        </ul>
+
+                        <div class="border rounded p-2 bg-light small">
+                            <strong>Billed To:</strong> {{ fullName }}<br>
+                            <strong>Address:</strong> {{ address }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-black text-white py-3 text-center">
+        <p class="mb-0">&copy; 2026 EvNt Organizer. All rights reserved.</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+    <script src="billing.js"></script>
+</body>
+</html>
