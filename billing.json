@@ -1,0 +1,20 @@
+[
+  {
+    "name": "Brandon Sickler",
+    "address": "101 Main Street, Nashville, TN 37201",
+    "paymentMethod": {
+      "cardNumber": "4111-1111-1111-1111",
+      "expiration": "09/28",
+      "cvv": "123"
+    }
+  },
+  {
+    "name": "Brandon Sickler",
+    "address": "101 Main Street, Nashville, TN 37201",
+    "paymentMethod": {
+      "cardNumber": "1234567812345678",
+      "expiration": "09/28",
+      "cvv": "123"
+    }
+  }
+]
