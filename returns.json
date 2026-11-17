@@ -1,9 +1,46 @@
-[
-  {
-    "full name": "Brandon Sickler",
-    "email": "bs@gmail.com",
+{
+  "products": [
+    {
+      "id": "PASS-ALL",
+      "name": "Full Access Conference Pass",
+      "price": 299,
+      "image": "https://via.placeholder.com/80x60?text=VIP+Pass"
+    },
+    {
+      "id": "WORK-CLOUD",
+      "name": "Cloud Native Architecture Workshop",
+      "price": 99.5,
+      "image": "https://via.placeholder.com/80x60?text=Workshop"
+    },
+    {
+      "id": "SWAG-VIP",
+      "name": "VIP Speaker Luncheon & Swag Pack",
+      "price": 39.99,
+      "image": "https://via.placeholder.com/80x60?text=Swag+Pack"
+    }
+  ],
+  "returns": [
+    {
+      "full name": "Brandon Sickler",
+      "email": "bs@gmail.com",
       "order ID": "GHF-1111-111",
       "return Reason": "Scheduling Issue",
       "additional Details": "I can't make it there"
-  }
-]
+    },
+    {
+      "name": "Brandon Sickler",
+      "email": "brandon@example.com",
+      "orderId": "ORD-5261103",
+      "selectedItem": {
+        "id": "PASS-ALL",
+        "name": "Full Access Conference Pass",
+        "price": 299,
+        "image": "https://via.placeholder.com/80x60?text=VIP+Pass",
+        "$$hashKey": "object:4"
+      },
+      "returnReason": "scheduling",
+      "additionalDetails": "I have a scheduling conflict with another event sorry.",
+      "condition": "Unused / Unactivated"
+    }
+  ]
+}
