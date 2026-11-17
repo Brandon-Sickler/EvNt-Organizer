@@ -29,6 +29,27 @@ app.post('/api/billing', function (req, res) {
     });
 });
 
+
+app.post('/api/returns', function (req, res) {
+    const newReturn = req.body;
+
+    fs.readFile('returns.json', 'utf8', function (err, data) {
+        let jsonData = { products: [], returns: [] };
+        if (!err && data) {
+            jsonData = JSON.parse(data);
+        }
+
+        jsonData.returns.push(newReturn);
+
+        fs.writeFile('returns.json', JSON.stringify(jsonData, null, 2), function (writeErr) {
+            if (writeErr) {
+                return res.status(500).json({ message: 'Error saving return request.' });
+            }
+            res.json({ message: 'Return request saved successfully!' });
+        });
+    });
+});
+
 app.listen(PORT, function () {
     console.log('Server running on http://localhost:' + PORT);
 });

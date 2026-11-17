@@ -4,45 +4,52 @@ app.controller('ReturnsController', function ($scope) {
     $scope.email = '';
     $scope.orderId = '';
     $scope.returnReason = '';
+    $scope.condition = '';
     $scope.additionalDetails = '';
     $scope.errorMessage = '';
     $scope.successMessage = '';
     $scope.searchKeyword = '';
     $scope.selectedItem = null;
     $scope.searchResults = [];
+    $('#productSearchInput').val('');
 
-    $scope.products = [
-        { id: 'PASS-ALL', name: 'Full Access Conference Pass', price: 299.00 },
-        { id: 'WORK-CLOUD', name: 'Cloud Native Architecture Workshop', price: 99.50 },
-        { id: 'SWAG-VIP', name: 'VIP Speaker Luncheon & Swag Pack', price: 39.99 }
-    ];
-    $scope.handleSearch = function () {
-        if (!$scope.searchKeyword || $scope.searchKeyword.trim() === '') {
-            $scope.searchResults = [];
-            return;
-        }
-        $scope.searchResults = $scope.products.filter(product =>
-            product.name.toLowerCase().includes($scope.searchKeyword.toLowerCase())
-        );
-    }
+    $scope.products = [];
+
+    $.getJSON('returns.json', function (data) {
+        $scope.$apply(function () {
+            $scope.products = data.products || [];
+        });
+    });
+    $('#productSearchInput').on('keyup', function () {
+        var keyword = $(this).val().toLowerCase().trim();
+        $scope.$apply(function () {
+            if (keyword === '') {
+                $scope.searchResults = [];
+                return;
+            }
+            $scope.searchResults = $scope.products.filter(function (product) {
+                return product.name.toLowerCase().indexOf(keyword) !== -1;
+            });
+        });
+    });
     $scope.selectResult = function (product) {
         $scope.selectedItem = product;
-        $scope.searchKeyword = product.name;
+        $('#productSearchInput').val(product.name);
         $scope.searchResults = [];
-    }
+    };
     $scope.clearSelection = function () {
         $scope.selectedItem = null;
-        $scope.searchKeyword = '';
-    }
+        $('#productSearchInput').val('');
+        $scope.searchResults = [];
+    };
     $scope.submitReturnForm = function () {
         $scope.errorMessage = '';
-        $scope.successMessage = 'Return request submitted successfully.';
-        if (!$scope.fullName || !$scope.email || !$scope.orderId || !$scope.returnReason || !$scope.selectedItem) {
-            $scope.errorMessage = 'All fields are required.';
-            $scope.successMessage = 'Return request submitted successfully.';
+        $scope.successMessage = '';
+        if (!$scope.fullName || !$scope.email || !$scope.orderId || !$scope.condition || !$scope.returnReason || !$scope.selectedItem) {
+            $scope.errorMessage = 'All fields (including product condition and return reason) are required.';
             return;
         }
-        if(!$scope.additionalDetails || $scope.additionalDetails.length < 6) {
+        if (!$scope.additionalDetails || $scope.additionalDetails.length < 6) {
             $scope.errorMessage = 'Provide reason for the return if you can(at least 6 characters).';
             return;
         }
@@ -52,7 +59,8 @@ app.controller('ReturnsController', function ($scope) {
             orderId: $scope.orderId,
             selectedItem: $scope.selectedItem,
             returnReason: $scope.returnReason,
-            additionalDetails: $scope.additionalDetails
+            additionalDetails: $scope.additionalDetails,
+            condition: $scope.condition
         };
         $scope.jsonPayload = JSON.stringify(returnData, null, 2);
         $.ajax({
