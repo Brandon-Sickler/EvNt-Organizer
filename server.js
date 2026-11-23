@@ -73,8 +73,39 @@ app.delete('/api/billing/:id', function (req, res) {
         res.json({ message: 'Billing record deleted!' });
     });
 });
-
-
+app.get('/api/cart', function (req, res) {
+    db.query('SELECT * FROM cart', function (err, results) {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json(results);
+    });
+});
+app.post('/api/cart', function (req, res) {
+    const { productId, quantity } = req.body;
+    const sql = 'INSERT INTO cart (product_id, quantity) VALUES (?, ?)';
+    db.query(sql, [productId, quantity], function (err, result) {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json({ message: 'Item added to cart!', id: result.insertId });
+    });
+});
+app.put('/api/cart/:id', function (req, res) {
+    const { quantity } = req.body;
+    db.query('UPDATE cart SET quantity = ? WHERE id = ?', [quantity, req.params.id], function (err) {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json({ message: 'Cart item updated!' });
+    });
+});
+app.delete('/api/cart/:id', function (req, res) {
+    db.query('DELETE FROM cart WHERE id = ?', [req.params.id], function (err) {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json({ message: 'Item removed from cart!' });
+    });
+});
+app.get('/api/returns', function (req, res) {
+    db.query('SELECT * FROM returns ORDER BY created_at DESC', function (err, results) {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json(results);
+    });
+});
 app.post('/api/returns', function (req, res) {
     const { orderId, name, email, selectedItem, condition, returnReason, additionalDetails } = req.body;
     const productName = selectedItem ? selectedItem.name : 'Unknown Product';
@@ -82,6 +113,19 @@ app.post('/api/returns', function (req, res) {
     db.query(sql, [orderId, name, email, productName, condition, returnReason, additionalDetails], function (err) {
         if (err) return res.status(500).json({ message: 'Error saving return request.' });
         res.json({ message: 'Return request saved to MySQL!' });
+    });
+});
+app.put('/api/returns/:id', function (req, res) {
+    const { condition, returnReason, additionalDetails } = req.body;
+    db.query('UPDATE returns SET product_condition = ?, return_reason = ?, additional_details = ? WHERE id = ?', [condition, returnReason, additionalDetails, req.params.id], function (err) {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json({ message: 'Return request updated!' });
+    });
+});
+app.delete('/api/returns/:id', function (req, res) {
+    db.query('DELETE FROM returns WHERE id = ?', [req.params.id], function (err) {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json({ message: 'Return request deleted!' });
     });
 });
 
