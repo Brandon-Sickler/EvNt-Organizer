@@ -80,9 +80,9 @@ app.get('/api/cart', function (req, res) {
     });
 });
 app.post('/api/cart', function (req, res) {
-    const { productId, quantity } = req.body;
-    const sql = 'INSERT INTO cart (product_id, quantity) VALUES (?, ?)';
-    db.query(sql, [productId, quantity], function (err, result) {
+    const { productId, productName, quantity, price } = req.body;
+    const sql = 'INSERT INTO cart (product_id, product_name, quantity, price) VALUES (?, ?, ?, ?)';
+    db.query(sql, [productId || null, productName, quantity || 1, price], function (err, result) {
         if (err) return res.status(500).json({ error: err.message });
         res.json({ message: 'Item added to cart!', id: result.insertId });
     });
@@ -128,7 +128,36 @@ app.delete('/api/returns/:id', function (req, res) {
         res.json({ message: 'Return request deleted!' });
     });
 });
+app.get('/api/shipping', function (req, res) {
+    db.query('SELECT * FROM shipping ORDER BY created_at DESC', function (err, results) {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json(results);
+    });
+});
 
+app.post('/api/shipping', function (req, res) {
+    const { fullName, address, deliveryMethod } = req.body;
+    const sql = 'INSERT INTO shipping (full_name, address, delivery_method) VALUES (?, ?, ?)';
+    db.query(sql, [fullName, address, deliveryMethod], function (err, result) {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json({ message: 'Shipping details saved to MySQL!', id: result.insertId });
+    });
+});
+
+app.put('/api/shipping/:id', function (req, res) {
+    const { deliveryMethod } = req.body;
+    db.query('UPDATE shipping SET delivery_method = ? WHERE id = ?', [deliveryMethod, req.params.id], function (err) {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json({ message: 'Shipping method updated!' });
+    });
+});
+
+app.delete('/api/shipping/:id', function (req, res) {
+    db.query('DELETE FROM shipping WHERE id = ?', [req.params.id], function (err) {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json({ message: 'Shipping record deleted!' });
+    });
+});
 app.listen(PORT, function () {
     console.log('Server running on http://localhost:' + PORT);
 });
