@@ -54,7 +54,31 @@ const checkoutBtn = document.getElementById("checkoutBtn");
 const ajaxResponseAlert = document.getElementById("ajaxResponseAlert");
 
 document.addEventListener("DOMContentLoaded", function () {
-    renderCatalog(productCatalog);
+    // === BACKEND FETCH CALL (GET PRODUCTS) ===
+    fetch("/api/products")
+        .then((res) => res.json())
+        .then((data) => {
+            console.log("MySQL Products:", data);
+            if (data.length > 0) {
+                productCatalog = data.map((item) => ({
+                    id: item.product_code,
+                    title: item.name,
+                    category: "Admission Pass",
+                    format: "Conference Access",
+                    price: parseFloat(item.price),
+                    additionalInfo: "Database Product Record",
+                }));
+            }
+            renderCatalog(productCatalog);
+            document.getElementById("catalogCounter").textContent = `${productCatalog.length} Items`;
+        })
+        .catch(() => renderCatalog(productCatalog));
+
+    // === BACKEND FETCH CALL (GET CART) ===
+    fetch("/api/cart")
+        .then((res) => res.json())
+        .then((data) => console.log("MySQL Cart Records:", data));
+
     updateCartUI();
 });
 
@@ -75,15 +99,11 @@ productForm.addEventListener("submit", function (e) {
 
     const skuRegex = /^[A-Z0-9]{3,8}-[A-Z0-9]{2,6}$/;
     if (!skuRegex.test(id)) {
-        errors.push(
-            "Item SKU / ID must follow the standard hyphenated format (e.g., PASS-DEV or WRK-101).",
-        );
+        errors.push("Item SKU / ID must follow the standard hyphenated format (e.g., PASS-DEV or WRK-101).");
     }
 
     if (title.length < 5) {
-        errors.push(
-            "Item Title / Description must be at least 5 characters in length.",
-        );
+        errors.push("Item Title / Description must be at least 5 characters in length.");
     }
 
     if (!category) {
@@ -96,19 +116,16 @@ productForm.addEventListener("submit", function (e) {
 
     const parsedPrice = parseFloat(priceStr);
     if (priceStr === "" || isNaN(parsedPrice) || parsedPrice < 0) {
-        errors.push(
-            "Unit Price must be a valid non-negative number (enter 0 for free passes).",
-        );
+        errors.push("Unit Price must be a valid non-negative number (enter 0 for free passes).");
     }
 
     const duplicate = productCatalog.some((item) => item.id.toUpperCase() === id);
     if (duplicate) {
         errors.push(`An item with SKU "${id}" already exists in the catalog.`);
     }
+
     if (errors.length > 0) {
-        productErrorAlert.innerHTML = errors
-            .map((err) => `<div>&bull; ${err}</div>`)
-            .join("");
+        productErrorAlert.innerHTML = errors.map((err) => `<div>&bull; ${err}</div>`).join("");
         productErrorAlert.classList.remove("d-none");
         return;
     }
@@ -122,12 +139,26 @@ productForm.addEventListener("submit", function (e) {
         additionalInfo: additional || "Standard Conference Inclusions",
     };
 
+    // === BACKEND FETCH CALL (POST PRODUCT) ===
+    fetch("/api/products", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            product_code: newProduct.id,
+            name: newProduct.title,
+            price: newProduct.price,
+            image: "",
+        }),
+    })
+        .then((res) => res.json())
+        .then((data) => console.log("Product saved to MySQL:", data));
+
     productCatalog.push(newProduct);
     productForm.reset();
     renderCatalog(productCatalog);
-    document.getElementById("catalogCounter").textContent =
-        `${productCatalog.length} Items`;
+    document.getElementById("catalogCounter").textContent = `${productCatalog.length} Items`;
 });
+
 function renderCatalog(items) {
     catalogContainer.innerHTML = "";
 
@@ -164,6 +195,7 @@ function renderCatalog(items) {
         catalogContainer.appendChild(col);
     });
 }
+
 window.addToCart = function (productId) {
     const product = productCatalog.find((item) => item.id === productId);
     if (!product) return;
@@ -182,6 +214,7 @@ window.addToCart = function (productId) {
     }
     updateCartUI();
 };
+
 window.removeFromCart = function (productId) {
     shoppingCart = shoppingCart.filter((item) => item.id !== productId);
     updateCartUI();
@@ -251,10 +284,12 @@ function updateCartUI() {
     checkoutBtn.disabled = false;
     cartJsonOutput.textContent = JSON.stringify(shoppingCart, null, 2);
 }
+
 document.getElementById("clearCartBtn").addEventListener("click", function () {
     shoppingCart = [];
     updateCartUI();
 });
+
 $(document).ready(function () {
     function filterCatalog() {
         const query = $("#catalogSearchInput").val().toLowerCase().trim();
@@ -271,46 +306,52 @@ $(document).ready(function () {
         });
         renderCatalog(filtered);
     }
+
     $("#catalogSearchInput").on("input keyup", filterCatalog);
     $("#catalogCategoryFilter").on("change", filterCatalog);
+
     $("#checkoutBtn").on("click", function () {
         if (shoppingCart.length === 0) return;
-        const payload = {
-            orderId: "ORD-" + Date.now(),
-            timestamp: new Date().toISOString(),
-            itemCount: shoppingCart.reduce((acc, curr) => acc + curr.quantity, 0),
-            items: shoppingCart,
-            subtotal: parseFloat(cartSubtotalEl.textContent.replace("$", "")),
-            totalDue: parseFloat(cartTotalEl.textContent.replace("$", "")),
-        };
+
+        const orderId = "ORD-" + Date.now();
         const $btn = $(this);
-        $btn.prop("disabled", true).text("Transporting Data via AJAX...");
-        $.ajax({
-            url: "https://jsonplaceholder.typicode.com/posts",
-            type: "POST",
-            contentType: "application/json; charset=UTF-8",
-            data: JSON.stringify(payload),
-            success: function (response) {
+        $btn.prop("disabled", true).text("Saving Cart to MySQL...");
+
+        // === BACKEND FETCH CALL (POST CART) ===
+        Promise.all(
+            shoppingCart.map((item) =>
+                fetch("/api/cart", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        productId: null,
+                        productName: item.title,
+                        quantity: item.quantity,
+                        price: item.price,
+                    }),
+                }).then((res) => res.json())
+            )
+        )
+            .then(() => {
                 $("#ajaxResponseAlert")
                     .removeClass("d-none alert-danger")
                     .addClass("alert-success").html(`
-                    <strong>Registration Transport Successful! (HTTP 201 Created)</strong><br>
-                    Cart payload transported to RESTful API.<br>
-                    <small class="font-monospace">Transmitted Order ID: ${payload.orderId} | Server Record ID: ${response.id}</small>
+                    <strong>Cart Saved to MySQL!</strong><br>
+                    All cart items persisted to the database.<br>
+                    <small class="font-monospace">Transmitted Order ID: ${orderId}</small>
                 `);
                 shoppingCart = [];
                 updateCartUI();
                 window.scrollTo({ top: 0, behavior: "smooth" });
-            },
-            error: function (xhr, status, error) {
+            })
+            .catch(() => {
                 $("#ajaxResponseAlert")
                     .removeClass("d-none alert-success")
                     .addClass("alert-danger")
-                    .html(`<strong>AJAX Transport Error:</strong> ${error || status}`);
-            },
-            complete: function () {
+                    .html(`<strong>Database Error:</strong> Failed to save cart to MySQL.`);
+            })
+            .finally(() => {
                 $btn.prop("disabled", false).text("Submit Registration via AJAX");
-            },
-        });
+            });
     });
 });
