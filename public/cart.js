@@ -54,7 +54,6 @@ const checkoutBtn = document.getElementById("checkoutBtn");
 const ajaxResponseAlert = document.getElementById("ajaxResponseAlert");
 
 document.addEventListener("DOMContentLoaded", function () {
-    // === BACKEND FETCH CALL (GET PRODUCTS) ===
     fetch("/api/products")
         .then((res) => res.json())
         .then((data) => {
@@ -73,8 +72,6 @@ document.addEventListener("DOMContentLoaded", function () {
             document.getElementById("catalogCounter").textContent = `${productCatalog.length} Items`;
         })
         .catch(() => renderCatalog(productCatalog));
-
-    // === BACKEND FETCH CALL (GET CART) ===
     fetch("/api/cart")
         .then((res) => res.json())
         .then((data) => console.log("MySQL Cart Records:", data));
@@ -101,35 +98,28 @@ productForm.addEventListener("submit", function (e) {
     if (!skuRegex.test(id)) {
         errors.push("Item SKU / ID must follow the standard hyphenated format (e.g., PASS-DEV or WRK-101).");
     }
-
     if (title.length < 5) {
         errors.push("Item Title / Description must be at least 5 characters in length.");
     }
-
     if (!category) {
         errors.push("Please select an Item Category.");
     }
-
     if (!format) {
         errors.push("Please select a Unit of Measure / Format.");
     }
-
     const parsedPrice = parseFloat(priceStr);
     if (priceStr === "" || isNaN(parsedPrice) || parsedPrice < 0) {
         errors.push("Unit Price must be a valid non-negative number (enter 0 for free passes).");
     }
-
     const duplicate = productCatalog.some((item) => item.id.toUpperCase() === id);
     if (duplicate) {
         errors.push(`An item with SKU "${id}" already exists in the catalog.`);
     }
-
     if (errors.length > 0) {
         productErrorAlert.innerHTML = errors.map((err) => `<div>&bull; ${err}</div>`).join("");
         productErrorAlert.classList.remove("d-none");
         return;
     }
-
     const newProduct = {
         id: id,
         title: title,
@@ -138,8 +128,6 @@ productForm.addEventListener("submit", function (e) {
         price: parsedPrice,
         additionalInfo: additional || "Standard Conference Inclusions",
     };
-
-    // === BACKEND FETCH CALL (POST PRODUCT) ===
     fetch("/api/products", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -158,7 +146,6 @@ productForm.addEventListener("submit", function (e) {
     renderCatalog(productCatalog);
     document.getElementById("catalogCounter").textContent = `${productCatalog.length} Items`;
 });
-
 function renderCatalog(items) {
     catalogContainer.innerHTML = "";
 
@@ -169,7 +156,6 @@ function renderCatalog(items) {
         </div>`;
         return;
     }
-
     items.forEach((item) => {
         const col = document.createElement("div");
         col.className = "col-md-6 col-lg-3";
@@ -195,7 +181,6 @@ function renderCatalog(items) {
         catalogContainer.appendChild(col);
     });
 }
-
 window.addToCart = function (productId) {
     const product = productCatalog.find((item) => item.id === productId);
     if (!product) return;
@@ -214,12 +199,10 @@ window.addToCart = function (productId) {
     }
     updateCartUI();
 };
-
 window.removeFromCart = function (productId) {
     shoppingCart = shoppingCart.filter((item) => item.id !== productId);
     updateCartUI();
 };
-
 window.updateQuantity = function (productId, newQty) {
     const qty = parseInt(newQty, 10);
     const cartItem = shoppingCart.find((item) => item.id === productId);
@@ -232,7 +215,6 @@ window.updateQuantity = function (productId, newQty) {
         updateCartUI();
     }
 };
-
 function updateCartUI() {
     cartTableBody.innerHTML = "";
     if (shoppingCart.length === 0) {
@@ -250,7 +232,6 @@ function updateCartUI() {
         cartJsonOutput.textContent = "[]";
         return;
     }
-
     let subtotal = 0;
     let totalItems = 0;
     shoppingCart.forEach((item) => {
@@ -270,11 +251,9 @@ function updateCartUI() {
         <td class="fw-bold">$${itemSubtotal.toFixed(2)}</td>
         <td class="text-center">
             <button class="btn btn-sm btn-outline-danger" onclick="removeFromCart('${item.id}')">Remove</button>
-        </td>
-    `;
+        </td>`;
         cartTableBody.appendChild(row);
     });
-
     const tax = subtotal * 0.0825;
     const grandTotal = subtotal + tax;
     cartSubtotalEl.textContent = `$${subtotal.toFixed(2)}`;
@@ -306,18 +285,13 @@ $(document).ready(function () {
         });
         renderCatalog(filtered);
     }
-
     $("#catalogSearchInput").on("input keyup", filterCatalog);
     $("#catalogCategoryFilter").on("change", filterCatalog);
-
     $("#checkoutBtn").on("click", function () {
         if (shoppingCart.length === 0) return;
-
         const orderId = "ORD-" + Date.now();
         const $btn = $(this);
         $btn.prop("disabled", true).text("Saving Cart to MySQL...");
-
-        // === BACKEND FETCH CALL (POST CART) ===
         Promise.all(
             shoppingCart.map((item) =>
                 fetch("/api/cart", {
