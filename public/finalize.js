@@ -6,8 +6,6 @@ app.controller('ShippingController', function ($scope) {
     $scope.deliveryMethod = 'Standard Delivery';
     $scope.errorMessage = '';
     $scope.successMessage = '';
-
-    // === BACKEND FETCH CALL (GET) ===
     fetch('/api/shipping')
         .then(function (response) {
             return response.json();
@@ -30,8 +28,6 @@ app.controller('ShippingController', function ($scope) {
             address: $scope.address,
             deliveryMethod: $scope.deliveryMethod
         };
-
-        // === BACKEND FETCH CALL (POST) ===
         fetch('/api/shipping', {
             method: 'POST',
             headers: {
