@@ -14,6 +14,13 @@ app.controller('ReturnsController', function ($scope) {
     $('#productSearchInput').val('');
 
     $scope.products = [];
+    fetch('/api/returns')
+        .then(function (response) {
+            return response.json();
+        })
+        .then(function (data) {
+            console.log('MySQL Return Records:', data);
+        });
 
     $.getJSON('returns.json', function (data) {
         $scope.$apply(function () {
@@ -62,30 +69,33 @@ app.controller('ReturnsController', function ($scope) {
             additionalDetails: $scope.additionalDetails,
             condition: $scope.condition
         };
-        $scope.jsonPayload = JSON.stringify(returnData, null, 2);
-        $.ajax({
-            url: 'http://localhost:3000/api/returns',
-            type: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify(returnData),
-            success: function (response) {
+        fetch('/api/returns', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(returnData)
+        })
+            .then(function (response) {
+                return response.json();
+            })
+            .then(function (data) {
+                console.log('Return request saved to MySQL:', data);
                 $scope.$apply(function () {
-                    $scope.successMessage = response.message || 'Return request submitted successfully.';
+                    $scope.successMessage = 'Return request submitted successfully!';
                     $scope.fullName = '';
                     $scope.email = '';
                     $scope.orderId = '';
+                    $scope.selectedItem = null;
                     $scope.returnReason = '';
                     $scope.additionalDetails = '';
-                    $scope.selectedItem = null;
-                    $scope.searchKeyword = '';
+                    $scope.condition = '';
                 });
-            },
-            error: function () {
+            })
+            .catch(function (){
                 $scope.$apply(function () {
-                    $scope.errorMessage = 'the return request did not work.';
-
+                    $scope.errorMessage = 'Error submitting return request. Please try again.';
                 });
-            }
-        });
+            });
     };
 });
